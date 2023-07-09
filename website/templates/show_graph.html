@@ -1,0 +1,31 @@
+{% extends 'template.html' %}
+
+{% block title %}
+    Show Graph
+{% endblock %}
+
+{% block content %}
+    <style>
+        .graph-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+
+        .graph-image {
+            max-width: 125%;
+            max-height: 125%;
+        }
+    </style>
+
+    <div class="container">
+        <div class="text-center mt-4 mb-4">
+            <a href="{{ url_for('views.graph_selection') }}" class="btn btn-primary">Go Back to Graph Selection</a>
+        </div>
+
+        <div class="graph-container">
+            <img src="{{ plot_path }}" alt="Stock Data Plot" class="graph-image">
+        </div>
+    </div>
+{% endblock %}

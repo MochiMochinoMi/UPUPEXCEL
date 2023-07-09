@@ -1,0 +1,25 @@
+<!-- base.html -->
+{% extends 'template.html' %}
+
+{% block title %}
+    Upload Historical Excel Sheets in a Zip File
+{% endblock %}
+
+{% block content %}
+    <div class="card text-center">
+        <div class="card-header">
+            <h1 class="mb-0">Upload Historical Excel Sheets</h1>
+        </div>
+        <div class="card-body">
+            <p class="lead">Please upload a zip file that contains a folder with all the historical Excel sheets.</p>
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('views.home') }}">
+                <div class="form-group">
+                    <input type="file" class="form-control" name="file" accept=".zip">
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'template.html' %}
+
+{% block title %}
+    Graph Selection
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-center">Plots Selection</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">Time Series Plots</h2>
+                    </div>
+                    <div class="card-body">
+
+                        <form id="plot_any_stock_form" action="{{ url_for('views.graph_selection') }}" method="POST">
+                            <input type="hidden" name="plot_type" value="plot_any_stock">
+
+                            <div class="form-group">
+                                <label for="start_date">Start Date:</label>
+                                <input type="text" name="start_date" id="start_date" class="form-control" required>
+                                <small id="start_date_error" class="text-danger d-none">Please enter a valid date in the format YYYY-MM-DD.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="end_date">End Date:</label>
+                                <input type="text" name="end_date" id="end_date" class="form-control" required>
+                                <small id="end_date_error" class="text-danger d-none">Please enter a valid date in the format YYYY-MM-DD.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="duration">Duration:</label>
+                                <select name="duration" id="duration" class="form-control" required>
+                                    <option value="Today to 3 days ahead">Today to 3 days ahead</option>
+                                    <option value="7 days">7 days</option>
+                                    <option value="14 days">14 days</option>
+                                    <option value="1 month">1 month</option>
+                                    <option value="3 months">3 months</option>
+                                    <option value="year">1 year</option>
+                                </select>
+                                <small id="duration_error" class="text-danger d-none">Please select a duration.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stock_names">Stock Names (comma-separated):</label>
+                                <input type="text" name="stock_names" id="stock_names" class="form-control" required>
+                                <small id="stock_names_error" class="text-danger d-none">Please enter at least one stock name.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="variable">Variable:</label>
+                                <select name="variable" id="variable" class="form-control" required>
+                                    <option value="Signal">Signal</option>
+                                    <option value="Prediction">Prediction</option>
+                                    <option value="Cumulative Value">Cumulative Value</option>
+                                </select>
+                                <small id="variable_error" class="text-danger d-none">Please select a variable.</small>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="log_scale" name="log_scale">
+                                <label class="form-check-label" for="log_scale">Log Scale</label>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Generate Graph</button>
+                            </div>
+                            <p>Choose from three variables (prediction, signal, or cumulative value) and select your preferred time unit. Plot one or multiple stocks or data points with the added flexibility of logarithmic scaling.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">Daily Stock Bar Charts</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="plot_daily_change_form" action="{{ url_for('views.graph_selection') }}" method="POST">
+                            <input type="hidden" name="plot_type" value="plot_daily_change">
+
+                            <div class="form-group">
+                                <label for="fixed_date">Fixed Date:</label>
+                                <input type="text" name="fixed_date" id="fixed_date" class="form-control" required>
+                                <small id="fixed_date_error" class="text-danger d-none">Please enter a valid date in the format YYYY-MM-DD.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticker">Ticker:</label>
+                                <input type="text" name="ticker" id="ticker" class="form-control" required>
+                                <small id="ticker_error" class="text-danger d-none">Please enter a ticker symbol.</small>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="log_scale" name="log_scale">
+                                <label class="form-check-label" for="log_scale">Log Scale</label>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Generate Graph</button>
+                                <p>plot daily data using a bar chart. Simply select the desired time and stock, and all variables will be plotted across the six available time categories. </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('plot_any_stock_form').addEventListener('submit', function(event) {
+            var startDateInput = document.getElementById('start_date');
+            var startDateError = document.getElementById('start_date_error');
+            var startDateValue = startDateInput.value;
+
+            if (!isDateValid(startDateValue)) {
+                event.preventDefault();
+                startDateError.classList.remove('d-none');
+            } else {
+                startDateError.classList.add('d-none');
+            }
+        });
+
+        document.getElementById('plot_daily_change_form').addEventListener('submit', function(event) {
+            var fixedDateInput = document.getElementById('fixed_date');
+            var fixedDateError = document.getElementById('fixed_date_error');
+            var fixedDateValue = fixedDateInput.value;
+
+            if (!isDateValid(fixedDateValue)) {
+                event.preventDefault();
+                fixedDateError.classList.remove('d-none');
+            } else {
+                fixedDateError.classList.add('d-none');
+            }
+        });
+
+        function isDateValid(dateString) {
+            var datePattern = /^\d{4}-\d{2}-\d{2}$/;
+            return datePattern.test(dateString);
+        }
+    </script>
+{% endblock %}
