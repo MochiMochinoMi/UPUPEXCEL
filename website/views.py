@@ -93,7 +93,7 @@ def graph_selection():
 def show_graph():
     plot_file_path = request.args.get('plot_path')
     # Delay for 1 second to allow time for the image to be generated
-    time.sleep(15)
+    time.sleep(25)
     # Render the show_graph.html template with the plot_path variable
     return render_template('show_graph.html', plot_path=plot_file_path)
 
