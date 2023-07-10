@@ -77,9 +77,9 @@ def graph_selection():
                 start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
                 end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
                 graph_thread = threading.Thread(target=plot_graph, args=(session.get('folder_path'), start_date, end_date, duration, stock_names,variable,log_scale))
-                graph_thread.start()
-                plot_file_name = os.path.join(os.getcwd(),'temp', 'stock_data_plot0.jpg')
-                return redirect(url_for('views.show_graph', plot_path=plot_file_name))
+                plot_file_name = 'stock_data_plot.png'
+                plot_file_path = os.path.join('website', 'static', plot_file_name)
+                return redirect(url_for('views.show_graph', plot_path=plot_file_path))
             
         elif plot_type == 'plot_daily_change':
             log_scale = False  # Default value
@@ -92,8 +92,9 @@ def graph_selection():
                 return render_template('graph_selection.html')
             graph_thread = threading.Thread(target=plot_graph2, args=(session.get('folder_path'), time, ticker,log_scale))
             graph_thread.start()
-            plot_file_name = os.path.join(os.getcwd(),'temp', 'stock_data_plot1.jpg')
-            return redirect(url_for('views.show_graph', plot_path=plot_file_name))
+            plot_file_name = 'stock_data_plot_daily.png'
+            plot_file_path = os.path.join('website', 'static', plot_file_name)
+            return redirect(url_for('views.show_graph', plot_path=plot_file_path))
 
     delete_cached_images()
     return render_template('graph_selection.html')
@@ -103,11 +104,13 @@ def graph_selection():
 
 from flask import send_from_directory
 
-@views.route('/show_graph/<path:plot_path>')
-def show_graph(plot_path):
-
-    time.sleep(10)
-    return send_file(plot_path, mimetype='image/jpeg')
+@views.route('/show_graph')
+def show_graph():
+    plot_file_path = request.args.get('plot_path')
+    # Delay for 1 second to allow time for the image to be generated
+    time.sleep(5)
+    # Render the show_graph.html template with the plot_path variable
+    return render_template('show_graph.html', plot_path=plot_file_path)
 
 
 def delete_cached_images():
