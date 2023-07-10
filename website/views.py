@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for,flash
+from flask import Blueprint, render_template, request, session, redirect, url_for,flash,send_file
 import pandas as pd
 import os
 from .logic import extract_zip, stack_excel_data, plot_stock_data,plot_single_daily_data,is_valid_date
@@ -105,10 +105,9 @@ from flask import send_from_directory
 
 @views.route('/show_graph/<path:plot_path>')
 def show_graph(plot_path):
-    directory = os.path.dirname(plot_path)
-    filename = os.path.basename(plot_path)
-    time.sleep(5)
-    return send_from_directory(directory, filename, as_attachment=False)
+
+    time.sleep(10)
+    return send_file(plot_path, mimetype='image/jpeg')
 
 
 def delete_cached_images():
