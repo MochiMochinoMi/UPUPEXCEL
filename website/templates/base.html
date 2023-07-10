@@ -11,7 +11,7 @@
             <h1 class="mb-0">Upload Historical Excel Sheets</h1>
         </div>
         <div class="card-body">
-            <p class="lead">Please upload a zip file that contains a folder with all the historical Excel sheets.</p>
+            <p class="lead">Please upload a zip file that contains all the historical Excel sheets.</p>
             <form method="POST" enctype="multipart/form-data" action="{{ url_for('views.home') }}">
                 <div class="form-group">
                     <input type="file" class="form-control" name="file" accept=".zip">
