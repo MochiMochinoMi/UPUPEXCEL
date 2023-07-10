@@ -94,7 +94,7 @@ def graph_selection():
             graph_thread = threading.Thread(target=plot_graph2, args=(session.get('folder_path'), time, ticker,log_scale))
             graph_thread.start()
             plot_file_name = 'stock_data_plot_daily.png'
-            plot_file_path = os.path.join('website', 'static', plot_file_name)
+            plot_file_path = plot_file_name
             return redirect(url_for('views.show_graph', plot_path=plot_file_path))
 
     delete_cached_images()
