@@ -162,9 +162,9 @@ def plot_stock_data(df, start_date, end_date, duration, stock_names, plot_variab
     if len(filtered_data) == 0 or plot_variable not in filtered_data.columns:
         message = f'No {plot_variable} data available'
         plt.annotate(message, xy=(0.5, -0.1), xycoords='axes fraction', ha='center', va='center', color='red')
-    
-    plot_file_path = 'website/static/stock_data_plot.png'
-    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight', format='png')
+    folder_path = 'temp'
+    plot_file_name = os.path.join(os.getcwd(),folder_path, 'stock_data_plot0.jpg')
+    plt.savefig(plot_file_name, dpi=300, bbox_inches='tight', format='jpg')
 
     plt.close()
 
@@ -178,6 +178,7 @@ def plot_stock_data(df, start_date, end_date, duration, stock_names, plot_variab
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+from flask import session
 
 
 
@@ -238,9 +239,9 @@ def plot_single_daily_data(data, ticker, time, log_scale=False):
 
     if log_scale:
         plt.yscale('log')
-
-    plot_file_path = 'website/static/stock_data_plot_daily.png'  # Modify the file path as needed
-    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight', format='png')
+    folder_path = 'temp'
+    plot_file_name = os.path.join(os.getcwd(),folder_path, 'stock_data_plot1.jpg')
+    plt.savefig(plot_file_name, dpi=300, bbox_inches='tight', format='jpg')
     plt.close()
 
 

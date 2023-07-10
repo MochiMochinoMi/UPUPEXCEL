@@ -14,8 +14,8 @@
         }
 
         .graph-image {
-            max-width: 125%;
-            max-height: 125%;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .warning {
@@ -32,7 +32,7 @@
         </div>
 
         <div class="graph-container">
-            <img src="{{ plot_path }}" alt="Stock Data Plot" class="graph-image">
+            <img src="{{ url_for('static', filename=plot_path) }}" alt="Stock Data Plot" class="graph-image">
         </div>
     </div>
 {% endblock %}
