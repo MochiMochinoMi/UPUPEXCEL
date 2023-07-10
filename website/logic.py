@@ -111,86 +111,121 @@ def stack_excel_data(folder_path):
 
 
 
-def plot_stock_data(stacked_data, start_date, end_date, duration, stock_names, plot_variable,log_scale=False):
-    # Convert start_date and end_date to datetime objects
-    start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
-    end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
 
-    # Find the nearest available start and end dates in the DataFrame
-    nearest_start_date = min(stacked_data.index, key=lambda x: abs((x - start_datetime).days))
-    nearest_end_date = min(stacked_data.index, key=lambda x: abs((x - end_datetime).days))
 
-    # Filter the data based on nearest_start_date, nearest_end_date, and duration
-    filtered_data = stacked_data.loc[(stacked_data.index >= nearest_start_date) & 
-                                     (stacked_data.index <= nearest_end_date) & 
-                                     (stacked_data['Duration'] == duration)]
+import datetime
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pandas as pd
 
-    filtered_data = filtered_data[filtered_data['Name'].isin(stock_names)]
-    # Pivot the data to have stock names as columns and dates as index
-    pivot_data = filtered_data.pivot(columns='Name', values=plot_variable)
-
-    # Set the figure size
-    plt.figure(figsize=(12, 8))  # Adjust the width and height as per your preference
-
-    # Plot the variable for each stock name
-    lines = []
-    legend_labels = []
+def plot_stock_data(df, start_date, end_date, duration, stock_names, plot_variable, log_scale=False):
+    filtered_data = df[(df.index >= start_date) & (df.index <= end_date) & (df['Duration'] == duration)]
+    
+    plt.figure(figsize=(12, 6))
+    
     for stock_name in stock_names:
-        line, = plt.plot(pivot_data.index, pivot_data[stock_name], linewidth=2)  # Adjust the linewidth
-        lines.append(line)
-        legend_labels.append(stock_name)
-
-    # Set the plot title and labels
-    plt.title(f'{plot_variable} for Stocks over {duration} from {nearest_start_date.date()} to {nearest_end_date.date()}')
+        stock_data = filtered_data[filtered_data['Name'] == stock_name]
+        if len(stock_data) > 0:
+            plt.plot(stock_data.index, stock_data[plot_variable], marker='o', label=stock_name)
+    
     plt.xlabel('Date')
     plt.ylabel(plot_variable)
-
-    # Move the legend to the side
-    plt.legend(lines, legend_labels, bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
-
-    # Add a grid
+    plt.title(f'{plot_variable} For the ({duration}) Duration - from {start_date} to {end_date}')
+    plt.xticks(rotation=45)
     plt.grid(True)
+    plt.legend()
+    
+    if len(stock_names) > 0:
+        plt.xlim(start_date, end_date)
+    
+    if len(filtered_data) == 0:
+        plt.gca().xaxis.set_major_locator(plt.NullLocator())
+        plt.gca().yaxis.set_major_locator(plt.NullLocator())
+        plt.text(0.5, 0.5, 'No data available', ha='center', va='center', transform=plt.gca().transAxes)
+    else:
+        duration_days = (end_date - start_date).days
+        
+        ax = plt.gca()
+        if duration_days <= 60:  # Less than or equal to 2 months
+            ax.xaxis.set_major_locator(mdates.DayLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b-%Y'))
+        elif duration_days > 60 and duration_days <= 365:  # Between 2 months and 1 year
+            ax.xaxis.set_major_locator(mdates.MonthLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+        else:  # Larger than 1 year
+            ax.xaxis.set_major_locator(mdates.YearLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+            
     if log_scale:
         plt.yscale('log')
-    # Save the figure as a PNG file
-    plot_file_path = 'website/static/stock_data_plot.png'  # Modify the file path as needed
-    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight')
     
+    if len(filtered_data) == 0 or plot_variable not in filtered_data.columns:
+        message = f'No {plot_variable} data available'
+        plt.annotate(message, xy=(0.5, -0.1), xycoords='axes fraction', ha='center', va='center', color='red')
+    
+    plot_file_path = 'website/static/stock_data_plot.jpg'
+    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight', format='jpg')
+
     plt.close()
 
 
 
+
+
+
+
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 
-import matplotlib.patches as mpatches
+
 
 def plot_single_daily_data(data, ticker, time, log_scale=False):
-    # Filter the data for the desired ticker and closest time
+    # Check if the stock name exists in the data
+    if ticker not in data['Name'].unique():
+        print(f"Warning: Stock '{ticker}' does not exist in the data.")
+        return
+
+    # Filter the data for the desired ticker
     filtered_data = data[data['Name'] == ticker]
+
+    # Find the closest available date to the specified time
     closest_time = min(filtered_data.index, key=lambda x: abs(x - time))
+    if closest_time != time:
+        print(f"Warning: Data not available for the specified date. Using closest date: {closest_time}")
+
+    # Define the desired categories and their order
+    categories = [
+        'Today to 3 days ahead',
+        '7 days',
+        '14 days',
+        '1 month',
+        '3 months',
+        'year'
+    ]
 
     # Create bar charts for single daily data set
     plt.figure(figsize=(12, 6))
     bar_width = 0.2
     opacity = 0.8
-    categories = filtered_data['Duration'].unique()  # Get unique categories for the ticker
     colors = ['red', 'green', 'blue']  # Assign colors to prediction, cumulative value, and signal
 
     for i, category in enumerate(categories):
         category_data = filtered_data[filtered_data['Duration'] == category]
         x = [i + j * bar_width for j in range(3)]  # Three bars for each category
         y = [
-            category_data[category_data.index == closest_time]['Prediction'].mean(),
-            category_data[category_data.index == closest_time]['Cumulative Value'].mean(),
-            category_data[category_data.index == closest_time]['Signal'].mean()
+            category_data[category_data.index == closest_time]['Prediction'].values[0],
+            category_data[category_data.index == closest_time]['Cumulative Value'].values[0],
+            category_data[category_data.index == closest_time]['Signal'].values[0]
         ]
         plt.bar(x, y, width=bar_width, alpha=opacity, color=colors)
 
     plt.xlabel('Time Category')
-    plt.ylabel('Mean')
+    plt.ylabel('Value')
     plt.title(f'Single Daily Data Set - Ticker: {ticker} - Closest Time: {closest_time}')
     plt.xticks([i + bar_width for i in range(len(categories))], categories)
-    
+
     # Create custom legend
     legend_patches = [
         mpatches.Patch(color='red', label='Prediction'),
@@ -200,15 +235,13 @@ def plot_single_daily_data(data, ticker, time, log_scale=False):
     plt.legend(handles=legend_patches, loc='upper right')
 
     plt.tight_layout()
-    
+
     if log_scale:
         plt.yscale('log')
-    plot_file_path = 'website/static/stock_data_plot_daily.png'  # Modify the file path as needed
-    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight')
+
+    plot_file_path = 'website/static/stock_data_plot_daily.jpg'  # Modify the file path as needed
+    plt.savefig(plot_file_path, dpi=300, bbox_inches='tight', format='jpg')
     plt.close()
-
-
-
 
 
 
