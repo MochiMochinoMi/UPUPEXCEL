@@ -91,7 +91,6 @@ def graph_selection():
             if not is_valid_date(time):
                 flash('Please enter a valid date in the format YYYY-MM-DD.')
                 return render_template('graph_selection.html')
-            time= datetime.strptime(time, "%Y-%m-%d").date()
             graph_thread = threading.Thread(target=plot_graph2, args=(session.get('folder_path'), time, ticker,log_scale))
             graph_thread.start()
             plot_file_name = 'stock_data_plot_daily.png'
