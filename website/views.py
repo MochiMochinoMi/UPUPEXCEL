@@ -78,8 +78,9 @@ def graph_selection():
                 end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
                 graph_thread = threading.Thread(target=plot_graph, args=(session.get('folder_path'), start_date, end_date, duration, stock_names,variable,log_scale))
                 plot_file_name = 'stock_data_plot.png'
-                plot_file_path = os.path.join('website', 'static', plot_file_name)
+                plot_file_path = os.path.join('static', plot_file_name)
                 return redirect(url_for('views.show_graph', plot_path=plot_file_path))
+
             
         elif plot_type == 'plot_daily_change':
             log_scale = False  # Default value
